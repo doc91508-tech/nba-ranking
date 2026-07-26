@@ -57,7 +57,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 <div class="scoring-bar"><span class="tag">冠军 <span class="pt">9</span></span><span class="sep">|</span><span class="tag">MVP <span class="pt">8</span></span><span class="sep">|</span><span class="tag">FMVP <span class="pt">4</span></span><span class="sep">|</span><span class="tag">DPOY <span class="pt">5</span></span><span class="sep">|</span><span class="tag">一阵 <span class="pt">6</span></span><span class="sep">|</span><span class="tag">二阵 <span class="pt">4.5</span></span><span class="sep">|</span><span class="tag">三阵 <span class="pt">2.5</span></span><span class="sep">|</span><span class="tag">防一阵 <span class="pt">4</span></span><span class="sep">|</span><span class="tag">防二阵 <span class="pt">2.5</span></span><span class="sep">|</span><span class="tag">王朝 <span class="pt">+15</span></span></div>
 </div>
 <script>
-// ===== Data =====
 var dynastyData=[
 {title:"比尔·拉塞尔的凯尔特人",subtitle:"1957-1969 · 11次总冠军",desc:"NBA最长的统治王朝，13年内11冠",img:"celtics-1981-072821.webp",color:"#007A33"},
 {title:"红衣主教奥尔巴赫",subtitle:"凯尔特人文化基石",desc:"打造凯尔特人冠军传奇的伟大教练与总管",img:"auerbach-celebrate.webp",color:"#007A33"},
@@ -72,20 +71,19 @@ var individualData=[
 {name:"迈克尔·乔丹",badge:"GOAT",desc:"6冠·5MVP·6FMVP·10得分王",img:"jordan-emotion-3-784x521-1.webp",color:"#CE1141"},
 {name:"乔丹的The Last Shot",badge:"1998总决赛G6",desc:"历史纪录片The Last Dance经典瞬间",img:"GettyImages-1173556.webp",color:"#CE1141"},
 {name:"比尔·拉塞尔",badge:"指环王",desc:"11冠·5MVP，NBA最伟大的赢家",img:"GettyImages-954331802.webp",color:"#007A33"},
-{name:"卡里姆·阿卜杜尔-贾巴尔", badge:"天勾", desc:"6冠·6MVP·2FMVP·历史得分王", img:"kareem-sky-hook-vs-knicks-archived.webp", color:"#552583"},
+{name:"卡里姆·阿卜杜尔-贾巴尔",badge:"天勾",desc:"6冠·6MVP·2FMVP·历史得分王",img:"kareem-sky-hook-vs-knicks-archived.webp",color:"#552583"},
 {name:"蒂姆·邓肯",badge:"石佛",desc:"5冠·2MVP·3FMVP·15全明星",img:"99DCER30ADuncan-scaled.avif",color:"#C4CED4"},
-{name:"拉里·伯德", badge:"大鸟", desc:"3冠·3MVP·2FMVP", img:"larry-bird.avif", color:"#007A33"},
-{name:"哈基姆·奥拉朱旺", badge:"大梦", desc:"2冠·1MVP·2FMVP·2DPOY·12全明星", img:"olajuwon-1920.webp", color:"#CE1141"},
-{name:"斯蒂芬·库里", badge:"萌神", desc:"4冠·2MVP·1FMVP·三分之神", img:"GettyImages-971530876-scaled.avif", color:"#FFC72C"},
-{name:"勒布朗·詹姆斯", badge:"小皇帝", desc:"4冠·4MVP·4FMVP·历史得分王", img:"GettyImages-168122497-784x523.avif", color:"#552583"},
-{name:"威尔特·张伯伦", badge:"篮球皇帝", desc:"2冠·4MVP·1FMVP·单场100分", img:"chamberlain-dunk-scaled-e1629733536536-2048x1153.jpg", color:"FFC72C"},
-{name:"魔术师约翰逊", badge:"魔术师", desc:"5冠·3MVP·3FMVP·Showtime领袖", img:"magic-johnson-iso-archive.jpg", color:"#552583"},
+{name:"拉里·伯德",badge:"大鸟",desc:"3冠·3MVP·2FMVP",img:"larry-bird.avif",color:"#007A33"},
+{name:"哈基姆·奥拉朱旺",badge:"大梦",desc:"2冠·1MVP·2FMVP·2DPOY·12全明星",img:"olajuwon-1920.webp",color:"#CE1141"},
+{name:"斯蒂芬·库里",badge:"萌神",desc:"4冠·2MVP·1FMVP·三分之神",img:"GettyImages-971530876-scaled.avif",color:"#FFC72C"},
+{name:"勒布朗·詹姆斯",badge:"小皇帝",desc:"4冠·4MVP·4FMVP·历史得分王",img:"GettyImages-168122497-784x523.avif",color:"#552583"},
+{name:"威尔特·张伯伦",badge:"篮球皇帝",desc:"2冠·4MVP·1FMVP·单场100分",img:"chamberlain-dunk-scaled-e1629733536536-2048x1153.jpg",color:"#FFC72C"},
+{name:"魔术师约翰逊",badge:"魔术师",desc:"5冠·3MVP·3FMVP·Showtime领袖",img:"magic-johnson-iso-archive.jpg",color:"#552583"},
 {name:"沙奎尔·奥尼尔",badge:"One of a Kind",desc:"4冠·1MVP·3FMVP，21世纪最强内线",img:"kobe-to-shaq.webp",color:"#552583"},
 {name:"科比·布莱恩特",badge:"黑曼巴",desc:"5冠·1MVP·2FMVP·18全明星·81分",img:"shaq-kobe-2002-finals.avif",color:"#552583"},
 {name:"双探花 塔图姆·布朗",badge:"历史第一18冠",desc:"凯尔特人2024夺冠，独享NBA历史最多总冠军",img:"16x9-Connected-safezone-5-1.avif",color:"#007A33"}
 ];
 
-// ===== Particles =====
 function iP(){
   var c=document.getElementById("particles");
   for(var i=0;i<25;i++){
@@ -99,17 +97,15 @@ function iP(){
   }
 }
 
-// ===== Build cards =====
-function buildCards(data,cid,did,isIndiv){
+function bC(data,cid,did,ii){
   var ct=document.getElementById(cid);
   var de=document.getElementById(did);
   for(var i=0;i<data.length;i++){
     var item=data[i];
     var card=document.createElement("div");
     card.className="card"+(i===0?" active":"");
-    var hasImg=item.img&&(item.img.indexOf(".jpg")>0||item.img.indexOf(".jpeg")>0||item.img.indexOf(".png")>0||item.img.indexOf(".webp")>0||item.img.indexOf(".avif")>0);
-    var tg=hasImg?'<img src="'+item.img+'" alt="">':'<span style="font-size:48px;opacity:0.2">&#127936;</span>';
-    if(!isIndiv){
+    var tg=item.img?'<img src="'+item.img+'" alt="">':'<span style="font-size:48px;opacity:0.2">&#127936;</span>';
+    if(!ii){
       card.innerHTML='<div class="card-img">'+tg+'</div><div class="card-text"><div class="title" style="color:'+item.color+'">'+item.title+'</div><div class="sub">'+item.subtitle+'</div><div class="desc">'+item.desc+'</div></div>';
     }else{
       card.innerHTML='<div class="card-img">'+tg+'</div><div class="card-text"><div class="badge" style="background:'+item.color+'20;color:'+item.color+';border:1px solid '+item.color+'40">'+item.badge+'</div><div class="title">'+item.name+'</div><div class="desc" style="margin-top:3px">'+item.desc+'</div></div>';
@@ -117,50 +113,43 @@ function buildCards(data,cid,did,isIndiv){
     ct.appendChild(card);
     var d=document.createElement("div");
     d.className="dot"+(i===0?" active":"");
-    d.setAttribute("data-idx",i);
-    d.onclick=function(){var idx=parseInt(this.getAttribute("data-idx"));goTo(cid,did,idx);};
+    d.idx=i;
+    d.onclick=function(){switchTo(de.id,this.idx);};
     de.appendChild(d);
   }
 }
 
-// ===== Navigation =====
-var dynCur=0,indivCur=0;
-var dynTimer,indivTimer;
-
-function goTo(cid,did,idx){
-  var isDyn=(cid==="dynastyContainer");
+function switchTo(did,idx){
+  var isDyn=did==="dynastyDots";
+  var cid=isDyn?"dynastyContainer":"indivContainer";
   var data=isDyn?dynastyData:individualData;
-  var cur=isDyn?dynCur:indivCur;
-  if(idx===cur)return;
-  if(idx<0||idx>=data.length)return;
   var ct=document.getElementById(cid);
   var de=document.getElementById(did);
+  var curKey=isDyn?"_d":"_i";
+  if(win[curKey]===undefined) win[curKey]=0;
+  var cur=win[curKey];
+  if(idx===cur||idx<0||idx>=data.length)return;
   ct.children[cur].className="card exit";
   de.children[cur].className="dot";
-  if(isDyn){dynCur=idx}else{indivCur=idx}
+  win[curKey]=idx;
   ct.children[idx].className="card active";
   de.children[idx].className="dot active";
-  resetTimers();
 }
 
-function nextDyn(){
-  goTo("dynastyContainer","dynastyDots",(dynCur+1)%dynastyData.length);
-}
-function nextIndiv(){
-  goTo("indivContainer","indivDots",(indivCur+1)%individualData.length);
-}
-function resetTimers(){
-  if(dynTimer)clearInterval(dynTimer);
-  if(indivTimer)clearInterval(indivTimer);
-  dynTimer=setInterval(nextDyn,5000);
-  indivTimer=setInterval(nextIndiv,6000);
+var win={},ti={};
+function autoRun(type){
+  var did=type==="dynasty"?"dynastyDots":"indivDots";
+  var data=type==="dynasty"?dynastyData:individualData;
+  var ck=type==="dynasty"?"_d":"_i";
+  if(win[ck]===undefined) win[ck]=0;
+  switchTo(did,(win[ck]+1)%data.length);
 }
 
-// ===== Init =====
 iP();
-buildCards(dynastyData,"dynastyContainer","dynastyDots",false);
-buildCards(individualData,"indivContainer","indivDots",true);
-resetTimers();
+bC(dynastyData,"dynastyContainer","dynastyDots",false);
+bC(individualData,"indivContainer","indivDots",true);
+ti.d=setInterval(function(){autoRun("dynasty");},5000);
+ti.i=setInterval(function(){autoRun("indiv");},6000);
 </script>
 
 <!-- ===== ???? ===== -->
