@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NBA历史球员综合排名 | 荣誉积分系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0a0e14;color:#e0e6ed;height:100vh;overflow:hidden}
+.hero{position:relative;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,#1a1f2e 0%,#0a0e14 70%)}
+.particles{position:absolute;inset:0;overflow:hidden;z-index:0}
+.particle{position:absolute;border-radius:50%;background:rgba(240,180,41,0.2);animation:float linear infinite}
+@keyframes float{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh);opacity:0}}
+.category-label{z-index:2;position:relative;font-size:14px;letter-spacing:4px;color:#6a7a92;margin-bottom:8px;font-weight:300;text-align:center}
+.showcase{position:relative;z-index:1;width:100%;max-width:900px;display:flex;flex-direction:column;align-items:center}
+.card-container{position:relative;width:100%;height:360px}
+.card-container.indiv{height:320px;margin-bottom:14px}
+.card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;opacity:0;transform:scale(0.9);transition:all 1s cubic-bezier(0.4,0,0.2,1);pointer-events:none}
+.card.active{opacity:1;transform:scale(1)}
+.card.exit{opacity:0;transform:scale(1.08);filter:blur(4px)}
+.card-img{width:400px;height:270px;border-radius:14px;background:#1c2331;overflow:hidden;border:1px solid #2d3546;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 40px rgba(0,0,0,0.4)}
+.card-img img{width:100%;height:100%;object-fit:cover;display:block}
+.indiv .card-img{width:340px;height:230px}
+.card-text{text-align:center;margin-top:14px}
+.card-text .title{font-size:22px;font-weight:700;margin-bottom:2px;color:#f0f4fa}
+.card-text .sub{font-size:13px;color:#8b95a9;margin-bottom:4px}
+.card-text .desc{font-size:12px;color:#5a6a82;line-height:1.5}
+.indiv .card-text .title{font-size:20px}.card-container.indiv{margin-bottom:6px}
+.badge{display:inline-block;padding:2px 10px;border-radius:3px;font-size:11px;font-weight:600;margin-bottom:6px}
+.separator{width:40%;height:1px;background:linear-gradient(90deg,transparent,#283040,transparent);margin:8px 0 12px 0;z-index:2;position:relative}
+.dots-row{display:flex;gap:10px;z-index:2;position:relative;margin-bottom:4px;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;background:#2d3546;transition:all 0.5s;cursor:pointer}
+.dot.active{background:#f0b429;box-shadow:0 0 10px rgba(240,180,41,0.5);width:28px;border-radius:4px}
+.enter-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 40px;background:linear-gradient(135deg,#f0b429,#d4940f);color:#0a0e14;border:none;border-radius:50px;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.3s;text-decoration:none;box-shadow:0 4px 25px rgba(240,180,41,0.3);z-index:2;position:relative}
+.enter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 35px rgba(240,180,41,0.45)}
+.enter-btn .arr{transition:transform 0.3s}
+.enter-btn:hover .arr{transform:translateX(4px)}
+.hint{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);z-index:2;color:#3a4a62;font-size:11px;letter-spacing:1px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:0.7}}
+.scoring-bar{position:absolute;bottom:0;left:0;right:0;padding:10px 12px;background:linear-gradient(transparent,rgba(10,14,20,0.95));display:flex;flex-wrap:wrap;justify-content:center;gap:2px 10px;font-size:10px;color:#5a6a82;z-index:2}
+.scoring-bar .tag{color:#8b95a9}.scoring-bar .pt{color:#f0b429;font-weight:600}.scoring-bar .sep{color:#283040}
+@media(max-width:768px){.card-container{height:290px}.card-container.indiv{height:260px}.card-img{width:280px;height:200px}.indiv .card-img{width:240px;height:170px}.card-text .title{font-size:18px}.category-label{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="hero">
+<div class="particles" id="particles"></div>
+<div class="category-label">&#9733; 六 大 王 朝</div>
+<div class="card-container" id="dynastyContainer"></div>
+<div class="dots-row" id="dynastyDots"></div>
+<div class="separator"></div>
+<div class="category-label">&#9733; 伟 大 个 人</div>
+<div class="card-container indiv" id="indivContainer"></div>
+<div class="dots-row" id="indivDots"></div>
+<a href="ranking.html" class="enter-btn">进入排名系统 <span class="arr">&#8594;</span></a>
+<div class="hint">基于荣誉积分的综合评估体系</div>
+<div class="scoring-bar"><span class="tag">冠军 <span class="pt">9</span></span><span class="sep">|</span><span class="tag">MVP <span class="pt">8</span></span><span class="sep">|</span><span class="tag">FMVP <span class="pt">4</span></span><span class="sep">|</span><span class="tag">DPOY <span class="pt">5</span></span><span class="sep">|</span><span class="tag">一阵 <span class="pt">6</span></span><span class="sep">|</span><span class="tag">二阵 <span class="pt">4.5</span></span><span class="sep">|</span><span class="tag">三阵 <span class="pt">2.5</span></span><span class="sep">|</span><span class="tag">防一阵 <span class="pt">4</span></span><span class="sep">|</span><span class="tag">防二阵 <span class="pt">2.5</span></span><span class="sep">|</span><span class="tag">王朝 <span class="pt">+15</span></span></div>
+</div>
+<script>
+// ===== Data =====
+var dynastyData=[
+{title:"比尔·拉塞尔的凯尔特人",subtitle:"1957-1969 · 11次总冠军",desc:"NBA最长的统治王朝，13年内11冠",img:"celtics-1981-072821.webp",color:"#007A33"},
+{title:"红衣主教奥尔巴赫",subtitle:"凯尔特人文化基石",desc:"打造凯尔特人冠军传奇的伟大教练与总管",img:"auerbach-celebrate.webp",color:"#007A33"},
+{title:"1980年代魔鸟争霸",subtitle:"魔术师vs大鸟 · 湖人凯尔特人共同统治",desc:"魔术师约翰逊与拉里·伯德的传奇对决，80年代双王朝",img:"GettyImages-1737696.jpg",color:"#552583"},
+{title:"Showtime 湖人",subtitle:"1980-1988 · 5次总冠军",desc:"魔术师、贾巴尔、沃西的华丽快攻时代",img:"lakers-1987-072721.webp",color:"#552583"},
+{title:"乔丹的公牛王朝",subtitle:"1991-1998 · 6次总冠军",desc:"迈克尔·乔丹的两次三连冠，绝对统治力",img:"michael-jordan-celebrates-archive.jpg",color:"#CE1141"},
+{title:"1998 公牛三巨头",subtitle:"乔丹·皮蓬·罗德曼",desc:"第二次三连冠最后一年，三巨头的最后舞台",img:"GettyImages-2912666.jpg",color:"#CE1141"},
+{title:"马刺王朝",subtitle:"1999-2014 · 5次总冠军",desc:"蒂姆·邓肯领军，近20年恒久稳定",img:"tim-duncan-championship-2014.jpg",color:"#C4CED4"},
+{title:"金州勇士",subtitle:"2015-2022 · 4次总冠军",desc:"斯蒂芬·库里的三分革命，改变了篮球运动",img:"warriors-2018-finals-trophy.avif",color:"#FFC72C"}
+];
+var individualData=[
+{name:"迈克尔·乔丹",badge:"GOAT",desc:"6冠·5MVP·6FMVP·10得分王",img:"jordan-emotion-3-784x521-1.webp",color:"#CE1141"},
+{name:"乔丹的The Last Shot",badge:"1998总决赛G6",desc:"历史纪录片The Last Dance经典瞬间",img:"GettyImages-1173556.webp",color:"#CE1141"},
+{name:"比尔·拉塞尔",badge:"指环王",desc:"11冠·5MVP，NBA最伟大的赢家",img:"GettyImages-954331802.webp",color:"#007A33"},
+{name:"卡里姆·阿卜杜尔-贾巴尔", badge:"天勾", desc:"6冠·6MVP·2FMVP·历史得分王", img:"kareem-sky-hook-vs-knicks-archived.webp", color:"#552583"},
+{name:"蒂姆·邓肯",badge:"石佛",desc:"5冠·2MVP·3FMVP·15全明星",img:"99DCER30ADuncan-scaled.avif",color:"#C4CED4"},
+{name:"拉里·伯德", badge:"大鸟", desc:"3冠·3MVP·2FMVP", img:"larry-bird.avif", color:"#007A33"},
+{name:"哈基姆·奥拉朱旺", badge:"大梦", desc:"2冠·1MVP·2FMVP·2DPOY·12全明星", img:"olajuwon-1920.webp", color:"#CE1141"},
+{name:"斯蒂芬·库里", badge:"萌神", desc:"4冠·2MVP·1FMVP·三分之神", img:"GettyImages-971530876-scaled.avif", color:"#FFC72C"},
+{name:"勒布朗·詹姆斯", badge:"小皇帝", desc:"4冠·4MVP·4FMVP·历史得分王", img:"GettyImages-168122497-784x523.avif", color:"#552583"},
+{name:"威尔特·张伯伦", badge:"篮球皇帝", desc:"2冠·4MVP·1FMVP·单场100分", img:"chamberlain-dunk-scaled-e1629733536536-2048x1153.jpg", color:"FFC72C"},
+{name:"魔术师约翰逊", badge:"魔术师", desc:"5冠·3MVP·3FMVP·Showtime领袖", img:"magic-johnson-iso-archive.jpg", color:"#552583"},
+{name:"沙奎尔·奥尼尔",badge:"One of a Kind",desc:"4冠·1MVP·3FMVP，21世纪最强内线",img:"kobe-to-shaq.webp",color:"#552583"},
+{name:"科比·布莱恩特",badge:"黑曼巴",desc:"5冠·1MVP·2FMVP·18全明星·81分",img:"shaq-kobe-2002-finals.avif",color:"#552583"},
+{name:"双探花 塔图姆·布朗",badge:"历史第一18冠",desc:"凯尔特人2024夺冠，独享NBA历史最多总冠军",img:"16x9-Connected-safezone-5-1.avif",color:"#007A33"}
+];
+
+// ===== Particles =====
+function iP(){
+  var c=document.getElementById("particles");
+  for(var i=0;i<25;i++){
+    var p=document.createElement("div");
+    p.className="particle";
+    p.style.left=Math.random()*100+"%";
+    p.style.animationDuration=(10+Math.random()*18)+"s";
+    p.style.animationDelay=(Math.random()*12)+"s";
+    p.style.width=p.style.height=(2+Math.random()*3)+"px";
+    c.appendChild(p);
+  }
+}
+
+// ===== Build cards =====
+function buildCards(data,cid,did,isIndiv){
+  var ct=document.getElementById(cid);
+  var de=document.getElementById(did);
+  for(var i=0;i<data.length;i++){
+    var item=data[i];
+    var card=document.createElement("div");
+    card.className="card"+(i===0?" active":"");
+    var hasImg=item.img&&(item.img.indexOf(".jpg")>0||item.img.indexOf(".jpeg")>0||item.img.indexOf(".png")>0||item.img.indexOf(".webp")>0||item.img.indexOf(".avif")>0);
+    var tg=hasImg?'<img src="'+item.img+'" alt="">':'<span style="font-size:48px;opacity:0.2">&#127936;</span>';
+    if(!isIndiv){
+      card.innerHTML='<div class="card-img">'+tg+'</div><div class="card-text"><div class="title" style="color:'+item.color+'">'+item.title+'</div><div class="sub">'+item.subtitle+'</div><div class="desc">'+item.desc+'</div></div>';
+    }else{
+      card.innerHTML='<div class="card-img">'+tg+'</div><div class="card-text"><div class="badge" style="background:'+item.color+'20;color:'+item.color+';border:1px solid '+item.color+'40">'+item.badge+'</div><div class="title">'+item.name+'</div><div class="desc" style="margin-top:3px">'+item.desc+'</div></div>';
+    }
+    ct.appendChild(card);
+    var d=document.createElement("div");
+    d.className="dot"+(i===0?" active":"");
+    d.setAttribute("data-idx",i);
+    d.onclick=function(){var idx=parseInt(this.getAttribute("data-idx"));goTo(cid,did,idx);};
+    de.appendChild(d);
+  }
+}
+
+// ===== Navigation =====
+var dynCur=0,indivCur=0;
+var dynTimer,indivTimer;
+
+function goTo(cid,did,idx){
+  var isDyn=(cid==="dynastyContainer");
+  var data=isDyn?dynastyData:individualData;
+  var cur=isDyn?dynCur:indivCur;
+  if(idx===cur)return;
+  if(idx<0||idx>=data.length)return;
+  var ct=document.getElementById(cid);
+  var de=document.getElementById(did);
+  ct.children[cur].className="card exit";
+  de.children[cur].className="dot";
+  if(isDyn){dynCur=idx}else{indivCur=idx}
+  ct.children[idx].className="card active";
+  de.children[idx].className="dot active";
+  resetTimers();
+}
+
+function nextDyn(){
+  goTo("dynastyContainer","dynastyDots",(dynCur+1)%dynastyData.length);
+}
+function nextIndiv(){
+  goTo("indivContainer","indivDots",(indivCur+1)%individualData.length);
+}
+function resetTimers(){
+  if(dynTimer)clearInterval(dynTimer);
+  if(indivTimer)clearInterval(indivTimer);
+  dynTimer=setInterval(nextDyn,5000);
+  indivTimer=setInterval(nextIndiv,6000);
+}
+
+// ===== Init =====
+iP();
+buildCards(dynastyData,"dynastyContainer","dynastyDots",false);
+buildCards(individualData,"indivContainer","indivDots",true);
+resetTimers();
+</script>
+
+<!-- ===== ???? ===== -->
+<div id="musicBtn" onclick="toggleMusic()" style="position:fixed;bottom:100px;right:20px;z-index:100;width:48px;height:48px;border-radius:50%;background:rgba(240,180,41,0.15);border:1px solid rgba(240,180,41,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.3s;font-size:20px;box-shadow:0 2px 15px rgba(0,0,0,0.3);">&#9835;</div>
+
+<script>
+var bgmAudio, isPlaying = false;
+
+function toggleMusic() {
+    if(!bgmAudio) {
+        bgmAudio = new Audio("bgm.ogg");
+        bgmAudio.loop = true;
+        bgmAudio.volume = 0.5;
+    }
+    if(isPlaying) {
+        bgmAudio.pause();
+        isPlaying = false;
+        var b = document.getElementById("musicBtn");
+        if(b) { b.style.background = "rgba(240,180,41,0.15)"; b.style.borderColor = "rgba(240,180,41,0.3)"; b.innerHTML = "&#9835;"; }
+    } else {
+        bgmAudio.play().catch(function(e){ console.log("Audio play failed:", e); });
+        isPlaying = true;
+        var b = document.getElementById("musicBtn");
+        if(b) { b.style.background = "rgba(240,180,41,0.3)"; b.style.borderColor = "rgba(240,180,41,0.6)"; b.innerHTML = "&#9834;"; }
+    }
+}</script>
+</body>
+</html>

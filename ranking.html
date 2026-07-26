@@ -1,0 +1,645 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBA历史球员排名 | 456人荣誉数据库</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0e14; color: #e0e6ed; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%); border-bottom: 1px solid #2d3546; padding: 24px 32px 20px; }
+.header h1 { font-size: 26px; font-weight: 700; letter-spacing: 0.5px; color: #f0f4fa; }
+.header h1 span { color: #f0b429; }
+.header p { font-size: 14px; color: #8b95a9; margin-top: 6px; }
+.header .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 13px; color: #b0bccf; }
+.header .legend-item { display: inline-flex; align-items: center; gap: 4px; }
+.header .legend-item .pt { color: #f0b429; font-weight: 600; }
+.container { max-width: 1600px; margin: 0 auto; padding: 16px 20px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; background: #141a24; padding: 14px 18px; border-radius: 10px; border: 1px solid #283040; }
+.controls input { flex: 1; min-width: 200px; padding: 8px 14px; background: #1c2331; border: 1px solid #354052; border-radius: 6px; color: #e0e6ed; font-size: 14px; outline: none; transition: border 0.2s; }
+.controls input:focus { border-color: #f0b429; }
+.controls input::placeholder { color: #5a6a82; }
+.controls select { padding: 8px 14px; background: #1c2331; border: 1px solid #354052; border-radius: 6px; color: #e0e6ed; font-size: 14px; outline: none; cursor: pointer; }
+.controls select:focus { border-color: #f0b429; }
+.controls .stat { font-size: 13px; color: #8b95a9; white-space: nowrap; }
+.controls .stat strong { color: #f0b429; }
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #283040; background: #10161f; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+thead { position: sticky; top: 0; z-index: 2; }
+th { background: #1c2331; color: #b0bccf; font-weight: 600; padding: 10px 10px; text-align: center; border-bottom: 2px solid #2d3546; cursor: pointer; user-select: none; transition: background 0.15s; }
+th:hover { background: #243044; }
+th.rank-col { width: 44px; min-width: 44px; }
+th.name-col { text-align: left; min-width: 120px; }
+td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #1e2635; }
+td.name-col { text-align: left; font-weight: 600; color: #f0f4fa; }
+td.rank-col { color: #8b95a9; font-weight: 700; font-size: 14px; }
+tbody tr:hover { background: rgba(240, 180, 41, 0.04); }
+tbody tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+.score-cell { font-weight: 700; color: #f0b429; font-size: 15px; }
+.top3 td.rank-col { color: #f0b429; font-size: 16px; }
+.cat-cell { color: #c8d0dc; }
+.cat-high { color: #f0b429; font-weight: 600; }
+.footer { text-align: center; padding: 20px; color: #5a6a82; font-size: 13px; border-top: 1px solid #1e2635; margin-top: 20px; }
+@media (max-width: 768px) {
+  .header { padding: 16px 16px 14px; }
+  .header h1 { font-size: 20px; }
+  .container { padding: 10px; }
+  .controls { padding: 10px 12px; gap: 8px; }
+  table { font-size: 12px; }
+  th, td { padding: 6px 6px; }
+  .legend { font-size: 11px; gap: 4px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>NBA历史球员综合排名 <span>· 荣誉积分系统</span></h1>
+  <p>根据总冠军、MVP、FMVP、DPOY、AMVP、全明星、最佳阵容、最佳防守阵容、最佳新秀、得分王、三分/扣篮大赛冠军等荣誉综合评分</p>
+  <div class="legend">
+    <span class="legend-item">冠军 <span class="pt">9</span></span>
+    <span class="legend-item">MVP <span class="pt">8</span></span>
+    <span class="legend-item">FMVP <span class="pt">4</span></span>
+    <span class="legend-item">DPOY <span class="pt">5</span></span>
+    <span class="legend-item">AMVP <span class="pt">1.5</span></span>
+    <span class="legend-item">全明星 <span class="pt">1</span></span>
+    <span class="legend-item">一阵 <span class="pt">6</span> / 二阵 <span class="pt">4.5</span> / 三阵 <span class="pt">2.5</span></span>
+    <span class="legend-item">防一阵 <span class="pt">6</span> / 防二阵 <span class="pt">4.5</span></span>
+    <span class="legend-item">最佳新秀 <span class="pt">1</span></span>
+    <span class="legend-item">得分王 <span class="pt">3</span></span>
+    <span class="legend-item">三分大赛 <span class="pt">1</span> / 扣篮大赛 <span class="pt">1</span> / 第六人 <span class="pt">1</span></span>
+    <span class="legend-item">二连MVP <span class="pt">+1</span> / 三连MVP <span class="pt">+2</span></span>
+    <span class="legend-item">王朝 <span class="pt">+15</span></span>
+  </div>
+</div>
+<div class="container">
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="搜索球员姓名...">
+    <select id="sortSelect">
+      <option value="total">总分排序</option>
+      <option value="championships">总冠军数</option>
+      <option value="mvp">MVP</option>
+      <option value="fmvp">FMVP</option>
+      <option value="dpoy">DPOY</option>
+      <option value="allstar">全明星</option>
+      <option value="amvp">AMVP</option>
+      <option value="allnba1">一阵</option>
+      <option value="allnba2">二阵</option>
+      <option value="allnba3">三阵</option>
+      <option value="alldef1">防一阵</option>
+      <option value="alldef2">防二阵</option>
+      <option value="scoringTitle">得分王</option>
+      <option value="dynasty">王朝</option>
+    </select>
+    <span class="stat">共 <strong id="playerCount">0</strong> 名球员</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="rank-col">#</th>
+          <th class="name-col">球员</th>
+          <th>总分</th>
+          <th title="总冠军">冠军</th>
+          <th title="MVP">MVP</th>
+          <th title="FMVP">FMVP</th>
+          <th title="DPOY">DPOY</th>
+          <th title="AMVP">AMVP</th>
+          <th title="全明星">全明星</th>
+          <th title="最佳阵容一阵">一阵</th>
+          <th title="最佳阵容二阵">二阵</th>
+          <th title="最佳阵容三阵">三阵</th>
+          <th title="最佳防守阵容一阵">防一</th>
+          <th title="最佳防守阵容二阵">防二</th>
+          <th title="最佳新秀">ROY</th>
+          <th title="得分王">得分王</th>
+          <th title="三分大赛冠军">3分</th>
+          <th title="扣篮大赛冠军">扣篮</th>
+          <th title="最佳第六人">第六人</th>
+          <th title="王朝成员">王朝</th>
+        </tr>
+      </thead>
+      <tbody id="playerTableBody"></tbody>
+    </table>
+  </div>
+  <div class="footer">数据来源：NBA官方历史记录 · 荣誉截止至2025-26赛季</div>
+</div>
+<script>
+const SCORE = {
+  championship: 9, mvp: 8, fmvp: 4, dpoy: 5, amvp: 1.5,
+  allstar: 1.5, allnba1: 6, allnba2: 4.5, allnba3: 2.5,
+  alldef1: 4, alldef2: 2.5, roy: 1, scoringTitle: 4,
+  threePtContest: 1, dunkContest: 1,
+  sixthMan: 1,
+  mvpBackToBack: 15, mvpThreePeat: 23, dynasty: 15
+};
+const players = [
+  {name:"A.C. Green", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Adrian Dantley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Adrian Smith", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Al Cervi", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Al Horford", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Al Jefferson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Alex Caruso", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Alex English", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:8,allnba1:0,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Alex Groza", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:2,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Allen Iverson", championships:0,mvp:1,fmvp:0,dpoy:0,amvp:2,allstar:11,allnba1:3,allnba2:3,allnba3:1,alldef1:0,alldef2:0,roy:1,scoringTitle:4,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Alonzo Mourning", championships:1,mvp:0,fmvp:0,dpoy:2,amvp:0,allstar:7,allnba1:1,allnba2:1,allnba3:0,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Alvin Robertson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:2,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Amar'e Stoudemire", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:1,allnba2:4,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Amen Thompson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Anderson Varejao", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Andre Drummond", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Andre Iguodala", championships:4,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Andre Roberson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Andrei Kirilenko", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Andrew Bogut", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Andrew Bynum", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Andy Phillip", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Anfernee Hardaway", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:2,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Anthony Davis", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:10,allnba1:4,allnba2:1,allnba3:0,alldef1:3,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Anthony Edwards", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:4,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Anthony Mason", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Antonio McDyess", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Archie Clark", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Arnie Risen", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Artis Gilmore", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ausar Thompson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Avery Bradley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bailey Howell", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bam Adebayo", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:5,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Baron Davis", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ben Simmons", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:1,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ben Wallace", championships:1,mvp:0,fmvp:0,dpoy:4,amvp:0,allstar:4,allnba1:0,allnba2:3,allnba3:2,alldef1:5,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Benard King", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bernard King", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:1,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bill Bridges", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bill Hanzlik", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bill Russell", championships:11,mvp:5,fmvp:0,dpoy:0,amvp:1,allstar:12,allnba1:3,allnba2:8,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:2,sixthMan:0,dynasty:1},
+  {name:"Bill Sharman", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:8,allnba1:4,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Bill Walton", championships:2,mvp:1,fmvp:1,dpoy:0,amvp:0,allstar:2,allnba1:1,allnba2:1,allnba3:0,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:1},
+  {name:"Billy Cunningham", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:3,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Blake Griffin", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:3,allnba3:2,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:1,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bob Cousy", championships:6,mvp:1,fmvp:0,dpoy:0,amvp:2,allstar:13,allnba1:10,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Bob Dandridge", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bob Davies", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:4,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bob Feerick", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:2,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bob Gross", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bob Lanier", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:8,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bob Love", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bob McAdoo", championships:2,mvp:1,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:3,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Bob Pettit", championships:1,mvp:2,fmvp:0,dpoy:0,amvp:4,allstar:11,allnba1:10,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:2,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bobby Jones", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:0,allnba3:0,alldef1:8,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Bobby Phills", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bobby Wanzer", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bones McKinney", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Brad Daugherty", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bradley Beal", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Brandon Roy", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Brian Taylor", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Brook Lopez", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bruce Bowen", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:5,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Buck Williams", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:0,alldef1:2,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Buddy Jeannette", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Cade Cunningham", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:1,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Caldwell Jones", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Carl Braun", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Carlos Boozer", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Carmelo Anthony", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:10,allnba1:0,allnba2:2,allnba3:4,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Cason Wallace", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Cedric Maxwell", championships:0,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Charles Barkley", championships:0,mvp:1,fmvp:0,dpoy:0,amvp:1,allstar:11,allnba1:5,allnba2:5,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Charles Oakley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Chauncey Billups", championships:1,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:1,allnba3:2,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Chet Holmgren", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Chick Halbert", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Chris Bosh", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:11,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Chris Mullin", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:2,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Chris Paul", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:12,allnba1:4,allnba2:5,allnba3:2,alldef1:7,alldef2:2,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Chris Webber", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:3,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Cliff Hagan", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Clifford Robinson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Clyde Drexler", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:10,allnba1:1,allnba2:2,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Clyde Lovellette", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Connie Hawkins", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dale Ellis", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Damian Lillard", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:9,allnba1:1,allnba2:4,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dan Majerle", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dan Roundfield", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:0,alldef1:3,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Danny Green", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Danny Vranes", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dave Bing", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:7,allnba1:2,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dave Cowens", championships:2,mvp:1,fmvp:0,dpoy:0,amvp:1,allstar:8,allnba1:0,allnba2:3,allnba3:0,alldef1:1,alldef2:2,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dave DeBusschere", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:8,allnba1:0,allnba2:1,allnba3:0,alldef1:6,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"David Lee", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"David Robinson", championships:2,mvp:1,fmvp:0,dpoy:1,amvp:0,allstar:10,allnba1:4,allnba2:2,allnba3:4,alldef1:4,alldef2:4,roy:1,scoringTitle:1,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"David Thompson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:4,allnba1:2,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"De'Aaron Fox", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"DeAndre Jordan", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:1,allnba2:0,allnba3:2,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"DeMar DeRozan", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:2,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"DeMarcus Cousins", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dejounte Murray", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dennis Johnson", championships:3,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:1,allnba3:0,alldef1:6,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Dennis Rodman", championships:5,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:2,alldef1:7,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Derek Harper", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Deron Williams", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Derrick Coleman", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Derrick McKey", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Derrick Rose", championships:0,mvp:1,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Derrick White", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Detlef Schrempf", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:2,dynasty:0},
+  {name:"Devin Booker", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dick Garmaker", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dick McGuire", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dick Van Arsdale", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dikembe Mutombo", championships:0,mvp:0,fmvp:0,dpoy:4,amvp:0,allstar:8,allnba1:0,allnba2:1,allnba3:2,alldef1:3,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dillon Brooks", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dirk Nowitzki", championships:1,mvp:1,fmvp:1,dpoy:0,amvp:0,allstar:14,allnba1:4,allnba2:5,allnba3:3,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dolph Schayes", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:12,allnba1:6,allnba2:6,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Domantas Sabonis", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dominique Wilkins", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:9,allnba1:1,allnba2:4,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Don Buse", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:4,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Don Chaney", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:5,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Donovan Mitchell", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:1,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Doug Christie", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Draymond Green", championships:4,mvp:0,fmvp:0,dpoy:1,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:1,alldef1:5,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Drazen Petrovic", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dudley Bradley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dwight Howard", championships:1,mvp:0,fmvp:0,dpoy:3,amvp:0,allstar:8,allnba1:5,allnba2:1,allnba3:2,alldef1:4,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:1,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dwyane Wade", championships:3,mvp:0,fmvp:1,dpoy:0,amvp:1,allstar:13,allnba1:2,allnba2:3,allnba3:3,alldef1:0,alldef2:3,roy:0,scoringTitle:1,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Dyson Daniels", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"E.C. Coleman", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Earl Monroe", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ed Macauley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:7,allnba1:3,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ed Sadowski", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Eddie Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Eddie Jones", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Elgin Baylor", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:11,allnba1:10,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Elton Brand", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Elvin Hayes", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:12,allnba1:3,allnba2:3,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Eric Bledsoe", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Eric Snow", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ernie Calverley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Evan Mobley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:1,allnba3:0,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Fat Lever", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Frankie Baumholtz", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Frankie Brian", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Fred Schaus", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Fred Scolari", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Gail Goodrich", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Gary Payton", championships:1,mvp:0,fmvp:0,dpoy:1,amvp:0,allstar:9,allnba1:2,allnba2:4,allnba3:2,alldef1:9,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Gary Payton. Seattle SuperSonics", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Gene Shue", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"George Gervin", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:9,allnba1:5,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"George Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"George McGinnis", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"George Mikan", championships:5,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:4,allnba1:6,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"George Yardley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Gerald Wallace", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Giannis Antetokounmpo", championships:1,mvp:2,fmvp:1,dpoy:1,amvp:1,allstar:10,allnba1:7,allnba2:2,allnba3:0,alldef1:4,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:0},
+  {name:"Gilbert Arenas", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Glen Rice", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:3,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Goran Dragic", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Grant Hill", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:1,allnba2:4,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Gus Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:4,allnba3:0,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Gus Williams", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Hakeem Olajuwon", championships:2,mvp:1,fmvp:2,dpoy:2,amvp:0,allstar:12,allnba1:6,allnba2:3,allnba3:3,alldef1:5,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Hal Greer", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:10,allnba1:0,allnba2:7,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Harry Gallatin", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Hassan Whiteside", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Herb Jones", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Horace Grant", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Howie Dallmar", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Isaiah Thomas", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Isiah Thomas", championships:2,mvp:0,fmvp:1,dpoy:0,amvp:2,allstar:12,allnba1:3,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ivica Zubac", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ja Morant", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jack George", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jack Sikma", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jack Twyman", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jaden McDaniels", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jalen Brunson", championships:1,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jalen Duren", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jalen Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jalen Suggs", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jalen Williams", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jamaal Wilkes", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jamal Mashburn", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jamal Murray", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"James Harden", championships:0,mvp:1,fmvp:0,dpoy:0,amvp:0,allstar:11,allnba1:6,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:1,scoringTitle:3,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"James Worthy", championships:3,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Jaren Jackson Jr", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jason Kidd", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:10,allnba1:5,allnba2:1,allnba3:0,alldef1:4,alldef2:5,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jaylen Brown", championships:1,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jayson Tatum", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:6,allnba1:4,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jermaine O'Neal", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:1,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jerry Lucas", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:7,allnba1:3,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jerry Sloan", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:4,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jerry West", championships:1,mvp:0,fmvp:1,dpoy:0,amvp:1,allstar:14,allnba1:10,allnba2:2,allnba3:0,alldef1:4,alldef2:1,roy:0,scoringTitle:1,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jim Brewer", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jim Cleamons", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jim Paxson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jim Pollard", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:2,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jim Price", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jimmy Butler", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:1,allnba3:4,alldef1:0,alldef2:5,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jo Jo White", championships:0,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Joakim Noah", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:1,allnba2:0,allnba3:0,alldef1:2,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Joe Caldwell", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Joe Dumars", championships:2,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:1,allnba3:2,alldef1:4,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Joe Fulks", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:3,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Joe Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Joel Embiid", championships:0,mvp:1,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:1,allnba2:4,allnba3:0,alldef1:0,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"John Havlicek", championships:8,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:13,allnba1:4,allnba2:7,allnba3:0,alldef1:5,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"John Logan", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"John Starks", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"John Stockton", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:10,allnba1:2,allnba2:6,allnba3:3,alldef1:0,alldef2:5,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"John Wall", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Josh Smith", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jrue Holiday", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:3,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Julius Erving", championships:1,mvp:1,fmvp:0,dpoy:0,amvp:2,allstar:11,allnba1:5,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:1,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Julius Randle", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Juwan Howard", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kareem Abdul-Jabbar", championships:6,mvp:6,fmvp:2,dpoy:0,amvp:0,allstar:19,allnba1:10,allnba2:5,allnba3:0,alldef1:5,alldef2:4,roy:0,scoringTitle:2,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Karl Malone", championships:0,mvp:2,fmvp:0,dpoy:0,amvp:2,allstar:14,allnba1:11,allnba2:2,allnba3:1,alldef1:3,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Karl-Anthony Towns", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:0,allnba3:3,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kawhi Leonard", championships:2,mvp:0,fmvp:2,dpoy:2,amvp:1,allstar:7,allnba1:3,allnba2:4,allnba3:0,alldef1:3,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Kemba Walker", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kenny Sailors", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kermit Washington", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kevin Durant", championships:2,mvp:1,fmvp:2,dpoy:0,amvp:2,allstar:16,allnba1:6,allnba2:6,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:4,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Kevin Garnett", championships:1,mvp:1,fmvp:0,dpoy:1,amvp:1,allstar:15,allnba1:4,allnba2:3,allnba3:2,alldef1:9,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kevin Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:4,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kevin Love", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kevin McHale", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:1,allnba2:0,allnba3:0,alldef1:3,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:2,dynasty:1},
+  {name:"Kevin Willis", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kirk Hinrich", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Klay Thompson", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Kobe Bryant", championships:5,mvp:1,fmvp:2,dpoy:0,amvp:4,allstar:18,allnba1:11,allnba2:2,allnba3:2,alldef1:9,alldef2:3,roy:0,scoringTitle:2,threePtContest:0,dunkContest:1,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Kyle Lowry", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kyrie Irving", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:9,allnba1:0,allnba2:1,allnba3:2,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:1,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"LaMarcus Aldridge", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:2,allnba3:3,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Larry Bird", championships:3,mvp:3,fmvp:2,dpoy:0,amvp:1,allstar:12,allnba1:9,allnba2:1,allnba3:0,alldef1:0,alldef2:3,roy:1,scoringTitle:0,threePtContest:1,dunkContest:0,mvpBonus:2,sixthMan:0,dynasty:1},
+  {name:"Larry Costello", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Larry Foust", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:8,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Larry Hughes", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Larry Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Larry Nance", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Latrell Sprewell", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"LeBron James", championships:4,mvp:4,fmvp:4,dpoy:0,amvp:3,allstar:22,allnba1:13,allnba2:4,allnba3:4,alldef1:5,alldef2:1,roy:1,scoringTitle:1,threePtContest:0,dunkContest:0,mvpBonus:2,sixthMan:0,dynasty:0},
+  {name:"Lenny Wilkens", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:9,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Lew Alcindor", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Lionel Hollins", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Lonnie Shelton", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Lou Hudson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Luguentz Dort", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Luka Doncic", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:6,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:1,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Luol Deng", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"M.L. Carr", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Magic Johnson", championships:5,mvp:3,fmvp:3,dpoy:0,amvp:2,allstar:12,allnba1:9,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:1},
+  {name:"Manu Ginobili", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:1},
+  {name:"Manute Bol", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Marc Gasol", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Marcus Camby", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Marcus Smart", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:3,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mark Eaton", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:3,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mark Price", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:1,allnba2:0,allnba3:3,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Marques Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Matisse Thybulle", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Maurice Cheeks", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:0,allnba3:0,alldef1:4,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Maurice Lucas", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Maurice Stokes", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Max Zaslofsky", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:4,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Michael Cooper", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:5,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Michael Jordan", championships:6,mvp:5,fmvp:6,dpoy:1,amvp:3,allstar:14,allnba1:10,allnba2:1,allnba3:0,alldef1:9,alldef2:0,roy:1,scoringTitle:10,threePtContest:0,dunkContest:2,mvpBonus:3,sixthMan:0,dynasty:1},
+  {name:"Michael Ray Richardson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Michael Redd", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Micheal Williams", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mikal Bridges", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mike Conley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mike Riordan", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mitch Richmond", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:6,allnba1:0,allnba2:3,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mookie Blaylock", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Moses Malone", championships:1,mvp:3,fmvp:1,dpoy:0,amvp:0,allstar:12,allnba1:4,allnba2:4,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:0},
+  {name:"Nate McMillan", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Nate Thurmond", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Neil Johnston", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:4,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Nikola Jokic", championships:1,mvp:3,fmvp:1,dpoy:0,amvp:0,allstar:6,allnba1:6,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:0},
+  {name:"Norm Van Lier", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:0,alldef1:3,alldef2:5,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"O.G. Anunoby", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"OG Anunoby", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Oscar Robertson", championships:1,mvp:1,fmvp:0,dpoy:0,amvp:3,allstar:12,allnba1:9,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Otis Birdsong", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"P.J. Brown", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Pascal Siakam", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Patrick Beverley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Patrick Beverly", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Patrick Ewing", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:11,allnba1:1,allnba2:6,allnba3:0,alldef1:0,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Pau Gasol", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:2,allnba3:2,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul Arizin", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:10,allnba1:3,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul George", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:9,allnba1:1,allnba2:0,allnba3:5,alldef1:2,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul Millsap", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul Pierce", championships:1,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:10,allnba1:0,allnba2:1,allnba3:3,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul Pressey", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul Seymour", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul Silas", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:2,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Paul Westphal", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:3,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Peja Stojakovic", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Pete Maravich", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:2,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Phil Chenier", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Phil Ford", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Phil Smith", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Quinn Buckner", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Raja Bell", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rajon Rondo", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:0,allnba3:1,alldef1:2,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ralph Beard", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ralph Sampson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:4,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Randy Smith", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:2,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ray Allen", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:10,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Reggie Miller", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:0,allnba3:3,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Richie Griffin", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Richie Guerin", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rick Barry", championships:1,mvp:0,fmvp:1,dpoy:0,amvp:1,allstar:8,allnba1:5,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:1,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rick Mahorn", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Robert Covington", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Robert Parish", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:9,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Robert Williams III", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rod Strickland", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rodney McCray", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ron Artest", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:1,alldef1:2,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Roy Hibbert", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rudy Gobert", championships:0,mvp:0,fmvp:0,dpoy:4,amvp:0,allstar:3,allnba1:0,allnba2:1,allnba3:3,alldef1:8,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rudy LaRusso", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Russell Westbrook", championships:0,mvp:1,fmvp:0,dpoy:0,amvp:2,allstar:9,allnba1:2,allnba2:5,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:2,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Sam Cassell", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Sam Jones", championships:10,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Scott Wedman", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Scottie Barnes", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Scottie Pippen", championships:6,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:7,allnba1:3,allnba2:2,allnba3:2,alldef1:8,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Serge Ibaka", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:3,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Shai Gilgeous-Alexander", championships:1,mvp:2,fmvp:1,dpoy:0,amvp:0,allstar:4,allnba1:4,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:1,threePtContest:0,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:0},
+  {name:"Shane Battier", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Shaquille O'Neal", championships:4,mvp:1,fmvp:3,dpoy:0,amvp:3,allstar:15,allnba1:8,allnba2:2,allnba3:4,alldef1:0,alldef2:3,roy:1,scoringTitle:2,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Shawn Kemp", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:3,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Shawn Marion", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Sidney Moncrief", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:4,allnba3:0,alldef1:4,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Slater Martin", championships:5,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:0,allnba2:5,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Slick Watts", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Spencer Haywood", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:2,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Stan Miasek", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:1,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Steph Curry", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Stephen Curry", championships:4,mvp:2,fmvp:1,dpoy:0,amvp:1,allstar:12,allnba1:4,allnba2:5,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:2,threePtContest:1,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:1},
+  {name:"Stephon Marbury", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Steve Nash", championships:0,mvp:2,fmvp:0,dpoy:0,amvp:0,allstar:8,allnba1:3,allnba2:2,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:0},
+  {name:"T.R. Dunn", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tayshaun Prince", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:4,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Terry Cummings", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Thabo Sefolosha", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Theo Ratliff", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tim Duncan", championships:5,mvp:2,fmvp:3,dpoy:0,amvp:1,allstar:15,allnba1:10,allnba2:3,allnba3:2,alldef1:8,alldef2:7,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:1,sixthMan:0,dynasty:1},
+  {name:"Tim Hardaway", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:3,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tiny Archibald", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:0,allnba1:3,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tom Chambers", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:4,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tom Gola", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:5,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tom Heinsohn", championships:8,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:4,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Tom Sanders", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tony Allen", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:3,alldef2:3,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tony Parker", championships:4,mvp:0,fmvp:1,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:3,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:1},
+  {name:"Toumani Camara", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tracy McGrady", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:7,allnba1:2,allnba2:3,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Trae Young", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tree Rollins", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:1,alldef2:1,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Truck Robinson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tyrese Haliburton", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:2,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tyrese Maxey", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Tyson Chandler", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:1,alldef1:1,alldef2:2,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Vern Mikkelsen", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:4,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Victor Oladipo", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:1,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Victor Wembanyama", championships:0,mvp:0,fmvp:0,dpoy:1,amvp:0,allstar:2,allnba1:1,allnba2:0,allnba3:0,alldef1:2,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Vin Baker", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:4,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Vince Carter", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:8,allnba1:0,allnba2:1,allnba3:1,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:1,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Walt Frazier", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:1,allstar:7,allnba1:4,allnba2:2,allnba3:0,alldef1:7,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Walter Davis", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:6,allnba1:0,allnba2:2,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Wes Unseld", championships:1,mvp:1,fmvp:1,dpoy:0,amvp:0,allstar:5,allnba1:1,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Willis Reed", championships:2,mvp:1,fmvp:2,dpoy:0,amvp:1,allstar:7,allnba1:1,allnba2:4,allnba3:0,alldef1:1,alldef2:0,roy:1,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Wilt Chamberlain", championships:2,mvp:4,fmvp:1,dpoy:0,amvp:1,allstar:13,allnba1:7,allnba2:3,allnba3:0,alldef1:2,alldef2:0,roy:1,scoringTitle:7,threePtContest:0,dunkContest:0,mvpBonus:2,sixthMan:0,dynasty:0},
+  {name:"World B. Free", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:1,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Yao Ming", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:8,allnba1:0,allnba2:2,allnba3:3,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Zach Randolph", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:1,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+
+  {name:"Lou Williams", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:3,dynasty:0},
+  {name:"Jamal Crawford", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:3,dynasty:0},
+  {name:"Ricky Pierce", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:2,dynasty:0},
+  {name:"Keldon Johnson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Payton Pritchard", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Naz Reid", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Malcolm Brogdon", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Tyler Herro", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Jordan Clarkson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Montrezl Harrell", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Eric Gordon", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"J.R. Smith", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Lamar Odom", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Jason Terry", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Leandro Barbosa", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:1},
+  {name:"Mike Miller", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Ben Gordon", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Antawn Jamison", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Bobby Jackson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Corliss Williamson", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Aaron McKie", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Rodney Rogers", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Darrell Armstrong", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Danny Manning", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Toni Kukoc", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:1},
+  {name:"Dell Curry", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+  {name:"Roy Tarpley", championships:0,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:1,dynasty:0},
+
+  {name:"Steve Kerr", championships:5,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Ron Harper", championships:5,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bill Wennington", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Luc Longley", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"John Paxson", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"B.J. Armstrong", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:1,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Will Perdue", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Stacey King", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kurt Rambis", championships:4,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Byron Scott", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Robert Horry", championships:7,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Derek Fisher", championships:5,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Rick Fox", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Brian Shaw", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Devean George", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Luke Walton", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Matt Bonner", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Michael Finley", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Brent Barry", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Fabricio Oberto", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Shaun Livingston", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Harrison Barnes", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"JaVale McGee", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"David West", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:2,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Zaza Pachulia", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Marreese Speights", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Festus Ezeli", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Mario Chalmers", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Udonis Haslem", championships:3,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Norris Cole", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"P.J. Tucker", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Pat Connaughton", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bobby Portis", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bruce Brown", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Jeff Green", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Aaron Gordon", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Kentavious Caldwell-Pope", championships:2,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+  {name:"Bruce Brown Jr.", championships:1,mvp:0,fmvp:0,dpoy:0,amvp:0,allstar:0,allnba1:0,allnba2:0,allnba3:0,alldef1:0,alldef2:0,roy:0,scoringTitle:0,threePtContest:0,dunkContest:0,mvpBonus:0,sixthMan:0,dynasty:0},
+];
+function calcScore(p) {
+  return p.championships * 9 + p.mvp * 8 + p.fmvp * 4 + p.dpoy * 5 + p.amvp * 1.5
+       + p.allstar * 1.5 + p.allnba1 * 6 + p.allnba2 * 4.5 + p.allnba3 * 2.5
+       + p.alldef1 * 4 + p.alldef2 * 2.5 + p.roy * 1 + p.scoringTitle * 4
+       + p.threePtContest * 1 + p.dunkContest * 1 + p.sixthMan * 1
+       + (p.mvpBonus || 0) + (p.dynasty ? 15 : 0);
+}
+players.forEach(p => { p.total = calcScore(p); });
+let currentSort = 'total';
+let currentFilter = '';
+function render() {
+  const q = currentFilter.toLowerCase();
+  let filtered = players.filter(p => p.name.toLowerCase().includes(q) || p.name.includes(q));
+  const key = currentSort;
+  filtered.sort((a, b) => b[key] - a[key]);
+  document.getElementById('playerCount').textContent = filtered.length;
+  const tbody = document.getElementById('playerTableBody');
+  tbody.innerHTML = '';
+  filtered.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    if (i < 3) tr.className = 'top3';
+    tr.innerHTML = '<td class="rank-col">' + (i + 1) + '</td>'
+      + '<td class="name-col">' + p.name + '</td>'
+      + '<td class="score-cell">' + p.total.toFixed(1) + '</td>'
+      + '<td class="' + (p.championships >= 5 ? 'cat-high' : 'cat-cell') + '">' + p.championships + '</td>'
+      + '<td class="' + (p.mvp >= 2 ? 'cat-high' : 'cat-cell') + '">' + p.mvp + '</td>'
+      + '<td class="' + (p.fmvp >= 2 ? 'cat-high' : 'cat-cell') + '">' + p.fmvp + '</td>'
+      + '<td class="' + (p.dpoy >= 1 ? 'cat-high' : 'cat-cell') + '">' + p.dpoy + '</td>'
+      + '<td class="cat-cell">' + p.amvp + '</td>'
+      + '<td class="' + (p.allstar >= 10 ? 'cat-high' : 'cat-cell') + '">' + p.allstar + '</td>'
+      + '<td class="' + (p.allnba1 >= 5 ? 'cat-high' : 'cat-cell') + '">' + p.allnba1 + '</td>'
+      + '<td class="cat-cell">' + p.allnba2 + '</td>'
+      + '<td class="cat-cell">' + p.allnba3 + '</td>'
+      + '<td class="' + (p.alldef1 >= 5 ? 'cat-high' : 'cat-cell') + '">' + p.alldef1 + '</td>'
+      + '<td class="cat-cell">' + p.alldef2 + '</td>'
+      + '<td class="' + (p.roy === 1 ? 'cat-high' : 'cat-cell') + '">' + p.roy + '</td>'
+      + '<td class="' + (p.scoringTitle >= 2 ? 'cat-high' : 'cat-cell') + '">' + p.scoringTitle + '</td>'
+      + '<td class="' + (p.threePtContest === 1 ? 'cat-high' : 'cat-cell') + '">' + p.threePtContest + '</td>'
+      + '<td class="' + (p.dunkContest >= 1 ? 'cat-high' : 'cat-cell') + '">' + p.dunkContest + '</td>' +
+        '<td class="' + (p.sixthMan >= 1 ? 'cat-high' : 'cat-cell') + '">' + p.sixthMan + '</td>' +
+        '<td class="' + (p.dynasty === 1 ? 'cat-high' : 'cat-cell') + '">' + (p.dynasty === 1 ? 'Y' : '-') + '</td>';
+    tbody.appendChild(tr);
+  });
+}
+function sortBy(key) { currentSort = key; render(); }
+document.getElementById('searchInput').addEventListener('input', (e) => { currentFilter = e.target.value; render(); });
+document.getElementById('sortSelect').addEventListener('change', (e) => { currentSort = e.target.value; render(); });
+render();
+</script>
+</body>
+</html>
